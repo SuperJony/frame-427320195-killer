@@ -1,4 +1,6 @@
-# frame-427320547-cleaner
+# Frame 427320547 Cleaner
+
+Frame 427320547 Cleaner is a Figma plugin designed to streamline the process of renaming layers by automatically assigning names based on layer type. This tool enhances the efficiency and convenience of layer management for designers.
 
 ## Development guide
 
