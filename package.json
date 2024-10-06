@@ -1,5 +1,5 @@
 {
-  "name": "frame-427320195-Cleaner",
+  "name": "frame-427320195-cleaner",
   "dependencies": {
     "@create-figma-plugin/ui": "^3.2.0",
     "@create-figma-plugin/utilities": "^3.2.0",
@@ -25,7 +25,7 @@
     "editorType": [
       "figma"
     ],
-    "id": "frame-427320195-Cleaner",
+    "id": "frame-427320195-cleaner",
     "name": "Frame 427320195 Cleaner",
     "main": "src/main.ts",
     "ui": "src/ui.tsx"
