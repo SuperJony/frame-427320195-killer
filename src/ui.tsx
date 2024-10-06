@@ -11,6 +11,7 @@ import {
 import { emit, on } from "@create-figma-plugin/utilities";
 import React from "preact/compat";
 import { useEffect, useState } from "preact/hooks";
+import { renameOptionsConfig, settingOptionsConfig } from "./options-config";
 import { AllOptions, RenameOptions, SettingOptions } from "./types";
 
 // Plugin 组件: 插件的主要 UI 组件
@@ -67,35 +68,29 @@ function Plugin({ savedOptions }: { savedOptions: AllOptions }) {
         <VerticalSpace space="large" />
 
         <Stack space="large">
-          {/* 重命名选项复选框 */}
+          {/* 默认图层复选框 */}
           <Checkbox value={true} disabled>
             <Text>🖼️ 默认图层</Text>
           </Checkbox>
 
-          <Checkbox
-            value={renameOptions.locked}
-            onValueChange={() => handleRenameOptionChange("locked")}
-          >
-            <Text>🔒 锁定图层</Text>
-          </Checkbox>
-
-          <Checkbox
-            value={renameOptions.hidden}
-            onValueChange={() => handleRenameOptionChange("hidden")}
-          >
-            <Text>👻 隐藏图层</Text>
-          </Checkbox>
-
-          <Checkbox
-            value={renameOptions.instance}
-            onValueChange={() => handleRenameOptionChange("instance")}
-          >
-            <Text>🧩 组件实例</Text>
-            <VerticalSpace space="small" />
-            <Text style={{ color: "#999" }}>
-              启用此选项将恢复实例默认名称，并重命名内部图层
-            </Text>
-          </Checkbox>
+          {/* 使用 map 生成其他重命名选项的复选框 */}
+          {renameOptionsConfig.map((option) => (
+            <Checkbox
+              key={option.key}
+              value={renameOptions[option.key]}
+              onValueChange={() => handleRenameOptionChange(option.key)}
+            >
+              <Text>
+                {option.emoji} {option.title}
+              </Text>
+              {option.description && (
+                <>
+                  <VerticalSpace space="small" />
+                  <Text style={{ color: "#999" }}>{option.description}</Text>
+                </>
+              )}
+            </Checkbox>
+          ))}
         </Stack>
 
         <VerticalSpace space="large" />
@@ -114,38 +109,23 @@ function Plugin({ savedOptions }: { savedOptions: AllOptions }) {
         <VerticalSpace space="medium" />
 
         <Stack space="large">
-          {/* 设置选项复选框 */}
-          <Checkbox
-            value={settingOptions.renameCustomNames}
-            onValueChange={() => handleSettingOptionChange("renameCustomNames")}
-          >
-            <Text>🛁 大扫除模式</Text>
-            <VerticalSpace space="small" />
-            <Text style={{ color: "#999" }}>
-              启用此选项将重命名用户自定义的图层名称。禁用时，仅重命名 Figma
-              和插件自动生成的图层名称
-            </Text>
-          </Checkbox>
-
-          <Checkbox
-            value={settingOptions.showSpacing}
-            onValueChange={() => handleSettingOptionChange("showSpacing")}
-          >
-            <Text>📏 显示间距</Text>
-            <VerticalSpace space="small" />
-            <Text style={{ color: "#999" }}>
-              启用此选项将在图层名称后显示 Auto Layout 的间距
-            </Text>
-          </Checkbox>
-
-          <Checkbox
-            value={settingOptions.usePascalCase}
-            onValueChange={() => handleSettingOptionChange("usePascalCase")}
-          >
-            <Text>🐫 使用大驼峰命名</Text>
-            <VerticalSpace space="small" />
-            <Text style={{ color: "#999" }}>默认命名方式为 kebab-case</Text>
-          </Checkbox>
+          {settingOptionsConfig.map((option) => (
+            <Checkbox
+              key={option.key}
+              value={settingOptions[option.key]}
+              onValueChange={() => handleSettingOptionChange(option.key)}
+            >
+              <Text>
+                {option.emoji} {option.title}
+              </Text>
+              {option.description && (
+                <>
+                  <VerticalSpace space="small" />
+                  <Text style={{ color: "#999" }}>{option.description}</Text>
+                </>
+              )}
+            </Checkbox>
+          ))}
         </Stack>
 
         <VerticalSpace space="medium" />
