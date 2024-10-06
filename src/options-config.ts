@@ -19,12 +19,13 @@ export const settingOptionsConfig: OptionConfig<SettingOptions>[] = [
     key: "showSpacing",
     emoji: "📏",
     title: "显示间距",
-    description: "启用此选项将在图层名称后显示 Auto Layout 的间距",
+    // description: "启用此选项将在图层名称后显示 Auto Layout 的间距",
   },
   {
     key: "usePascalCase",
     emoji: "🐫",
     title: "使用大驼峰命名",
+    // description: "启用此选项将使用大驼峰命名",
   },
 ];
 
@@ -43,6 +44,6 @@ export const renameOptionsConfig: OptionConfig<RenameOptions>[] = [
     key: "instance",
     emoji: "🧩",
     title: "组件实例",
-    description: "启用此选项将恢复实例默认名称，���重命名内部图层",
+    description: "启用此选项将恢复实例默认名称，并重命名内部图层",
   },
 ];
