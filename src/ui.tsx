@@ -63,16 +63,11 @@ function Plugin({ savedOptions }: { savedOptions: AllOptions }) {
       <Container space="medium">
         <VerticalSpace space="large" />
 
-        <Text>重命名范围设置 :</Text>
+        <Text>除了基础图层以外，对以下图层也进行重命名 :</Text>
 
         <VerticalSpace space="large" />
 
         <Stack space="large">
-          {/* 默认图层复选框 */}
-          <Checkbox value={true} disabled>
-            <Text>🖼️ 默认图层</Text>
-          </Checkbox>
-
           {/* 使用 map 生成其他重命名选项的复选框 */}
           {renameOptionsConfig.map((option) => (
             <Checkbox

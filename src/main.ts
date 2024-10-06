@@ -246,7 +246,7 @@ export default async function () {
   // 设置 UI 窗口大小
   const uiOptions = {
     width: 240,
-    height: 424,
+    height: 408,
   };
 
   // 加载保存的设置
