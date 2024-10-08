@@ -44,6 +44,6 @@ export const renameOptionsConfig: OptionConfig<RenameOptions>[] = [
     key: "instance",
     emoji: "🧩",
     title: "组件实例",
-    description: "启用此选项将恢复实例默认名称，并重命名内部图层",
+    // description: "启用此选项将恢复实例默认名称，并重命名内部图层",
   },
 ];

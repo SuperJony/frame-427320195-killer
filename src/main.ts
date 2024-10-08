@@ -6,7 +6,12 @@ import {
   showUI,
 } from "@create-figma-plugin/utilities";
 import { AllOptions } from "./types";
-import { isComponentType, shouldProcessNode, toKebabCase } from "./utilities";
+import {
+  isComponentType,
+  shouldProcessNode,
+  toKebabCase,
+  toPascalCase,
+} from "./utilities";
 
 // 定义 Figma 自动生成的图层名称模式
 const FIGMA_NAME_PATTERN =
@@ -246,7 +251,7 @@ export default async function () {
   // 设置 UI 窗口大小
   const uiOptions = {
     width: 240,
-    height: 408,
+    height: 262,
   };
 
   // 加载保存的设置
@@ -278,6 +283,10 @@ export default async function () {
   });
 
   // 监听 UI 发送的重命名事件
+  on("SETTING_OPEN", (settingOpen: boolean) => {
+    figma.ui.resize(240, settingOpen ? 262 : 408);
+  });
+
   on("RENAME", (receivedOptions: AllOptions) => {
     // 根据用户选项设置 skipInvisibleInstanceChildren
     figma.skipInvisibleInstanceChildren =
@@ -295,12 +304,4 @@ export default async function () {
       }
     });
   });
-}
-
-// 添加 toPascalCase 函数
-function toPascalCase(str: string): string {
-  return str
-    .split(/[-_\s]+/)
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-    .join("");
 }

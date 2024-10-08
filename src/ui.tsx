@@ -2,6 +2,7 @@ import {
   Button,
   Checkbox,
   Container,
+  Disclosure,
   Divider,
   render,
   Stack,
@@ -16,20 +17,23 @@ import { AllOptions, RenameOptions, SettingOptions } from "./types";
 
 // Plugin 组件: 插件的主要 UI 组件
 function Plugin({ savedOptions }: { savedOptions: AllOptions }) {
-  // 状态管理: 使用 useState 钩子管理重命名选项和设置选项
   const [renameOptions, setRenameOptions] = useState<RenameOptions>({
     instance: savedOptions.instance,
     locked: savedOptions.locked,
     hidden: savedOptions.hidden,
   });
+
   const [settingOptions, setSettingOptions] = useState<SettingOptions>({
     renameCustomNames: savedOptions.renameCustomNames,
     showSpacing: savedOptions.showSpacing,
     usePascalCase: savedOptions.usePascalCase,
   });
+
   const [hasSelection, setHasSelection] = useState(false);
 
-  // 副作用: 监听选择变化事件
+  const [settingOpen, setSettingOpen] = useState<boolean>(false);
+
+  // 监听选择变化事件
   useEffect(() => {
     on("SELECTION_CHANGED", (hasSelection: boolean) => {
       setHasSelection(hasSelection);
@@ -56,6 +60,12 @@ function Plugin({ savedOptions }: { savedOptions: AllOptions }) {
   const handleRenameClick = () => {
     emit("RENAME", { ...renameOptions, ...settingOptions });
   };
+
+  // 处理设置按钮点击事件的函数
+  function handleSettingClick() {
+    setSettingOpen(!settingOpen);
+    emit("SETTING_OPEN", settingOpen);
+  }
 
   // 渲染 UI 组件
   return (
@@ -100,9 +110,13 @@ function Plugin({ savedOptions }: { savedOptions: AllOptions }) {
 
       <Divider />
 
-      <Container space="medium">
-        <VerticalSpace space="medium" />
+      <VerticalSpace space="extraSmall" />
 
+      <Disclosure
+        onClick={handleSettingClick}
+        open={settingOpen}
+        title="🛠️ 设置"
+      >
         <Stack space="large">
           {settingOptionsConfig.map((option) => (
             <Checkbox
@@ -122,9 +136,9 @@ function Plugin({ savedOptions }: { savedOptions: AllOptions }) {
             </Checkbox>
           ))}
         </Stack>
+      </Disclosure>
 
-        <VerticalSpace space="medium" />
-      </Container>
+      <VerticalSpace space="extraSmall" />
     </>
   );
 }

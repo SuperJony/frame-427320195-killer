@@ -566,6 +566,10 @@ video {
   display: none;
 }
 
+.resize {
+  resize: both;
+}
+
 .text-2xl {
   font-size: 1.5rem;
   line-height: 2rem;
