@@ -5,6 +5,7 @@ import {
   saveSettingsAsync,
   showUI,
 } from "@create-figma-plugin/utilities";
+import { isFigmaGeneratedName, isValidFigmaNodeType } from "./figma-node-types";
 import { AllOptions } from "./types";
 import {
   isComponentType,
@@ -12,10 +13,6 @@ import {
   toKebabCase,
   toPascalCase,
 } from "./utilities";
-
-// 定义 Figma 自动生成的图层名称模式
-const FIGMA_NAME_PATTERN =
-  /^(RECTANGLE|ELLIPSE|TEXT|FRAME|GROUP|COMPONENT|COMPONENT_SET|INSTANCE|BOOLEAN_OPERATION|Union|Intersect|Subtract|Exclude)(\s\d+)?$/i;
 
 // 定义插件生成的图层名称列表
 const PLUGIN_GENERATED_NAMES = [
@@ -172,22 +169,19 @@ function renameNodeAndChildren(node: SceneNode, options: AllOptions): boolean {
  * @returns 是否为 Figma 或插件自动生成的名称
  */
 function isFigmaOrPluginGeneratedName(name: string, node: SceneNode): boolean {
-  // 处理文本节点的特殊情况
+  // 验证节点类型（使用缓存的验证函数）
+  if (!isValidFigmaNodeType(node.type)) {
+    console.warn(`未知的 Figma 节点类型: ${node.type}`);
+    return false;
+  }
+
+  // 处理文本节点
   if (node.type === "TEXT") {
-    const textNode = node as TextNode;
-    return textNode.autoRename || name.toLowerCase() === "text";
+    return (node as TextNode).autoRename || name === "text";
   }
 
-  // 处理布尔操作节点的特殊情况
-  if (node.type === "BOOLEAN_OPERATION") {
-    const booleanOperations = ["Union", "Intersect", "Subtract", "Exclude"];
-    return booleanOperations.some((op) => name.startsWith(op));
-  }
-
-  // 检查名称是否匹配节点类型（可能带有数字后缀）
-  const baseTypeName = node.type.charAt(0) + node.type.slice(1).toLowerCase();
-  const namePattern = new RegExp(`^${baseTypeName}(\\s\\d+)?$`, "i");
-  if (namePattern.test(name)) {
+  // 检查是否匹配 Figma 自动生成的名称模式（使用优化后的函数）
+  if (isFigmaGeneratedName(name)) {
     return true;
   }
 
