@@ -172,15 +172,27 @@ function renameNodeAndChildren(node: SceneNode, options: AllOptions): boolean {
  * @returns 是否为 Figma 或插件自动生成的名称
  */
 function isFigmaOrPluginGeneratedName(name: string, node: SceneNode): boolean {
-  const type = node.type;
-
-  // 处理文本节点
-  if (type === "TEXT") {
+  // 处理文本节点的特殊情况
+  if (node.type === "TEXT") {
     const textNode = node as TextNode;
-    return textNode.autoRename || name === "text";
+    return textNode.autoRename || name.toLowerCase() === "text";
   }
 
-  return FIGMA_NAME_PATTERN.test(name) || PLUGIN_NAME_PATTERN.test(name);
+  // 处理布尔操作节点的特殊情况
+  if (node.type === "BOOLEAN_OPERATION") {
+    const booleanOperations = ["Union", "Intersect", "Subtract", "Exclude"];
+    return booleanOperations.some((op) => name.startsWith(op));
+  }
+
+  // 检查名称是否匹配节点类型（可能带有数字后缀）
+  const baseTypeName = node.type.charAt(0) + node.type.slice(1).toLowerCase();
+  const namePattern = new RegExp(`^${baseTypeName}(\\s\\d+)?$`, "i");
+  if (namePattern.test(name)) {
+    return true;
+  }
+
+  // 检查是否匹配插件生成的名称模式
+  return PLUGIN_NAME_PATTERN.test(name);
 }
 
 /* ---------------------------------------------------------------------------------------------- */
