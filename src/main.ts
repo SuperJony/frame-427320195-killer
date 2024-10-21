@@ -56,10 +56,7 @@ function renameLayer(node: SceneNode, options: AllOptions): boolean {
   if (node.visible === false && !options.hidden) return false;
 
   // 检查是否需要重命名用户自定义的图层名称
-  if (
-    !options.renameCustomNames &&
-    !isFigmaOrPluginGeneratedName(node.name, node)
-  ) {
+  if (!options.renameCustomNames && !isFigmaOrPluginGeneratedName(node)) {
     return false;
   }
 
@@ -168,7 +165,8 @@ function renameNodeAndChildren(node: SceneNode, options: AllOptions): boolean {
  * @param node 图层节点
  * @returns 是否为 Figma 或插件自动生成的名称
  */
-function isFigmaOrPluginGeneratedName(name: string, node: SceneNode): boolean {
+function isFigmaOrPluginGeneratedName(node: SceneNode): boolean {
+  const name = node.name;
   // 验证节点类型（使用缓存的验证函数）
   if (!isValidFigmaNodeType(node.type)) {
     console.warn(`未知的 Figma 节点类型: ${node.type}`);
