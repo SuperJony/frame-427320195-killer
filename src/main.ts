@@ -178,7 +178,13 @@ function isFigmaOrPluginGeneratedName(node: SceneNode): boolean {
     return (node as TextNode).autoRename || name === "text";
   }
 
-  // 检查是否匹配 Figma 自动生成的名称模式（使用优化后的函数）
+  // 组件类型的特殊处理
+  if (node.type === "COMPONENT" || node.type === "COMPONENT_SET") {
+    // 只有匹配 "[类型][数字]" 格式时才返回 true
+    return /^\S+\s\d+$/.test(name);
+  }
+
+  // 其他类型的处理保持不变
   if (isFigmaGeneratedName(name)) {
     return true;
   }
