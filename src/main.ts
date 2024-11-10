@@ -44,13 +44,18 @@ const nodeTypeNameMap = new Map<NodeType, string>([
   ["ELLIPSE", "ellipse"],
 ]);
 
+//TODO mask group 无法重命名
+
 /**
  * 重命名单个图层
  * @param node 要重命名的图层节点
  * @param options 重命名选项
- * @returns 如果图层被重命名则返回 true,否则返回 false
+ * @returns 如果图层被重命名则返回 Promise<boolean>
  */
-function renameLayer(node: SceneNode, options: AllOptions): boolean {
+async function renameLayer(
+  node: SceneNode,
+  options: AllOptions
+): Promise<boolean> {
   // 根据选项跳过特定类型的图层
   if (node.locked && !options.locked) return false;
   if (node.visible === false && !options.hidden) return false;
@@ -68,13 +73,14 @@ function renameLayer(node: SceneNode, options: AllOptions): boolean {
     newName = getFrameName(node, options);
   } else if (node.type === "INSTANCE") {
     // 对于实例,使用其主组件或父组件集的名称
+    const mainComponent = await node.getMainComponentAsync();
     if (
-      node.mainComponent?.parent &&
-      node.mainComponent.parent.type === "COMPONENT_SET"
+      mainComponent?.parent &&
+      mainComponent.parent.type === "COMPONENT_SET"
     ) {
-      newName = node.mainComponent.parent.name;
+      newName = mainComponent.parent.name;
     } else {
-      newName = node.mainComponent?.name || "Instance";
+      newName = mainComponent?.name || "Instance";
     }
   } else if (node.type === "BOOLEAN_OPERATION") {
     newName = `boolean-${node.booleanOperation.toLowerCase()}`;
@@ -107,31 +113,29 @@ function renameLayer(node: SceneNode, options: AllOptions): boolean {
  * @returns 是否有任何图层被重命名
  */
 function renameLayersInSelection(options: AllOptions): Promise<boolean> {
-  return new Promise((resolve) => {
+  return new Promise(async (resolve) => {
     const selection = figma.currentPage.selection;
     let hasRenamed = false;
     let index = 0;
 
-    // 使用批处理来提高性能
-    function processNextBatch() {
+    async function processNextBatch() {
       const endIndex = Math.min(index + 100, selection.length);
       for (; index < endIndex; index++) {
         const node = selection[index];
-        // 根据选项跳过不需要处理的节点
         if (shouldProcessNode(node, options)) {
-          hasRenamed = renameNodeAndChildren(node, options) || hasRenamed;
+          hasRenamed =
+            (await renameNodeAndChildren(node, options)) || hasRenamed;
         }
       }
 
-      // 如果还有未处理的节点，安排下一批处理
       if (index < selection.length) {
-        setTimeout(processNextBatch, 0);
+        setTimeout(() => processNextBatch(), 0);
       } else {
         resolve(hasRenamed);
       }
     }
 
-    processNextBatch();
+    await processNextBatch();
   });
 }
 
@@ -141,17 +145,18 @@ function renameLayersInSelection(options: AllOptions): Promise<boolean> {
  * @param options 重命名选项
  * @returns 是否有任何节点被重命名
  */
-function renameNodeAndChildren(node: SceneNode, options: AllOptions): boolean {
-  // 如果是实例且不需要重命名实例,则直接返回
+async function renameNodeAndChildren(
+  node: SceneNode,
+  options: AllOptions
+): Promise<boolean> {
   if (node.type === "INSTANCE" && !options.instance) return false;
 
-  let hasRenamed = renameLayer(node, options);
+  let hasRenamed = await renameLayer(node, options);
 
-  // 如果选中的图层包含子集图层，则递归对内部的图层重命名
   if ("children" in node) {
-    node.children.forEach((child) => {
-      hasRenamed = renameNodeAndChildren(child, options) || hasRenamed;
-    });
+    for (const child of node.children) {
+      hasRenamed = (await renameNodeAndChildren(child, options)) || hasRenamed;
+    }
   }
 
   return hasRenamed;
@@ -279,15 +284,13 @@ export default async function () {
 
   const data = {
     savedOptions: savedOptions,
+    hasSelection: figma.currentPage.selection.length > 0,
   };
 
   // 显示 UI
   showUI(uiOptions, data);
 
-  // 初始化时发送选中状态
-  emit("SELECTION_CHANGED", figma.currentPage.selection.length > 0);
-
-  // 监听选中变化
+  // 只在选中变化时发送事件
   figma.on("selectionchange", () => {
     emit("SELECTION_CHANGED", figma.currentPage.selection.length > 0);
   });

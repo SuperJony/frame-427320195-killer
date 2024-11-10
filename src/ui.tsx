@@ -16,7 +16,13 @@ import { renameOptionsConfig, settingOptionsConfig } from "./options-config";
 import { AllOptions, RenameOptions, SettingOptions } from "./types";
 
 // Plugin 组件: 插件的主要 UI 组件
-function Plugin({ savedOptions }: { savedOptions: AllOptions }) {
+function Plugin({
+  savedOptions,
+  hasSelection: initialHasSelection,
+}: {
+  savedOptions: AllOptions;
+  hasSelection: boolean;
+}) {
   const [renameOptions, setRenameOptions] = useState<RenameOptions>({
     instance: savedOptions.instance,
     locked: savedOptions.locked,
@@ -29,15 +35,17 @@ function Plugin({ savedOptions }: { savedOptions: AllOptions }) {
     usePascalCase: savedOptions.usePascalCase,
   });
 
-  const [hasSelection, setHasSelection] = useState(false);
+  const [hasSelection, setHasSelection] = useState(initialHasSelection);
 
   const [settingOpen, setSettingOpen] = useState<boolean>(false);
 
-  // 监听选择变化事件
+  // 修改事件监听逻辑
   useEffect(() => {
-    on("SELECTION_CHANGED", (hasSelection: boolean) => {
+    function handleSelectionChange(hasSelection: boolean) {
       setHasSelection(hasSelection);
-    });
+    }
+
+    on("SELECTION_CHANGED", handleSelectionChange);
   }, []);
 
   // 处理重命名选项变化的函数
