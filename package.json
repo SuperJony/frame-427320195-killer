@@ -25,9 +25,15 @@
     "editorType": [
       "figma"
     ],
-    "id": "frame-427320547-cleaner",
+    "id": "1426932965476847955",
     "name": "Frame 427320547 Cleaner",
     "main": "src/main.ts",
-    "ui": "src/ui.tsx"
+    "ui": "src/ui.tsx",
+    "documentAccess": "dynamic-page",
+    "networkAccess": {
+      "allowedDomains": [
+        "none"
+      ]
+    }
   }
 }
