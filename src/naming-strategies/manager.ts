@@ -2,6 +2,7 @@ import { AllOptions } from "../types";
 import { BooleanOperationStrategy } from "./boolean-strategy";
 import { FrameNamingStrategy } from "./frame-strategy";
 import { InstanceNamingStrategy } from "./instance-strategy";
+import { BasicShapeStrategy } from "./shape-basic-strategy";
 import { ShapeNamingStrategy } from "./shape-strategy";
 import { TextStrategy } from "./text-strategy";
 import { NamingStrategy } from "./types";
@@ -20,6 +21,7 @@ export class NamingStrategyManager {
       new ShapeNamingStrategy(),
       new BooleanOperationStrategy(),
       new TextStrategy(),
+      new BasicShapeStrategy(),
     ];
   }
 

@@ -11,6 +11,11 @@ function toPascalCase(str: string): string {
     .join("");
 }
 
+function toCamelCase(str: string): string {
+  const pascal = toPascalCase(str);
+  return pascal.charAt(0).toLowerCase() + pascal.slice(1);
+}
+
 function toKebabCase(str: string): string {
   return str
     .replace(/([a-z])([A-Z])/g, "$1-$2")
@@ -25,4 +30,10 @@ function shouldProcessNode(node: SceneNode, options: AllOptions): boolean {
   return true;
 }
 
-export { isComponentType, shouldProcessNode, toKebabCase, toPascalCase };
+export {
+  isComponentType,
+  shouldProcessNode,
+  toCamelCase,
+  toKebabCase,
+  toPascalCase,
+};

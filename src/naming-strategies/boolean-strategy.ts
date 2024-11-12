@@ -9,7 +9,7 @@ export class BooleanOperationStrategy extends BaseNamingStrategy {
   async generateName(node: SceneNode, options: AllOptions): Promise<string> {
     if (node.type !== "BOOLEAN_OPERATION") throw new Error("Invalid node type");
 
-    const name = `boolean-${node.booleanOperation.toLowerCase()}`;
-    return this.formatName(name, options);
+    const operationType = node.booleanOperation.toLowerCase();
+    return this.formatName(operationType, options);
   }
 }
