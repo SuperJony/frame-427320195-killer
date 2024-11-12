@@ -284,7 +284,7 @@ export default async function () {
 
   const data = {
     savedOptions: savedOptions,
-    hasSelection: figma.currentPage.selection.length > 0,
+    initialSelection: figma.currentPage.selection.length > 0,
   };
 
   // 显示 UI

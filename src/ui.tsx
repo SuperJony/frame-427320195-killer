@@ -18,10 +18,10 @@ import { AllOptions, RenameOptions, SettingOptions } from "./types";
 // Plugin 组件: 插件的主要 UI 组件
 function Plugin({
   savedOptions,
-  hasSelection: initialHasSelection,
+  initialSelection,
 }: {
   savedOptions: AllOptions;
-  hasSelection: boolean;
+  initialSelection: boolean;
 }) {
   const [renameOptions, setRenameOptions] = useState<RenameOptions>({
     instance: savedOptions.instance,
@@ -35,7 +35,7 @@ function Plugin({
     usePascalCase: savedOptions.usePascalCase,
   });
 
-  const [hasSelection, setHasSelection] = useState(initialHasSelection);
+  const [hasSelection, setHasSelection] = useState(initialSelection);
 
   const [settingOpen, setSettingOpen] = useState<boolean>(false);
 
