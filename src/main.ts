@@ -180,7 +180,9 @@ function isFigmaOrPluginGeneratedName(node: SceneNode): boolean {
 
   // 组件类型的特殊处理
   if (node.type === "COMPONENT" || node.type === "COMPONENT_SET") {
-    return /^\S+\s\d+$/.test(name);
+    return (
+      name === "component" || name === "componentset" || /^\S+\s\d+$/.test(name)
+    );
   }
 
   // 检查是否为 Figma 生成的名称
