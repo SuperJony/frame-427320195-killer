@@ -47,13 +47,35 @@ export function isValidFigmaNodeType(type: string): type is FigmaNodeType {
   return validNodeTypeCache.has(type);
 }
 
-// 优化 isFigmaGeneratedName 函数
-const figmaNameRegex = new RegExp(
-  `^(${[...ALL_FIGMA_NODE_TYPES, ...BOOLEAN_OPERATIONS].join("|")})$`,
-  "i"
-);
-const figmaNameWithNumberRegex = /^\S+\s\d+$/;
+// const figmaNameRegex = new RegExp(
+//   `^(${[...ALL_FIGMA_NODE_TYPES, ...BOOLEAN_OPERATIONS].join("|")})$`,
+//   "i"
+// );
 
-export function isFigmaGeneratedName(name: string): boolean {
-  return figmaNameRegex.test(name) || figmaNameWithNumberRegex.test(name);
+export const figmaNameWithNumberRegex = /^\S+\s\d+$/;
+
+// 修改 isFigmaGeneratedName 函数
+export function isFigmaGeneratedName(node: SceneNode): boolean {
+  // 检查是否是带数字的 Figma 默认命名
+  if (figmaNameWithNumberRegex.test(node.name)) {
+    return true;
+  }
+
+  // 将输入名称转换为小写进行比较
+  const lowerName = node.name.toLowerCase();
+  const lowerType = node.type.toLowerCase();
+
+  // 检查名称是否与节点自身类型匹配
+  if (lowerName === lowerType) {
+    return true;
+  }
+
+  // 对于布尔操作，检查是否使用了布尔操作的名称
+  if (node.type === "BOOLEAN_OPERATION") {
+    return BOOLEAN_OPERATIONS.some(
+      (operation) => operation.toLowerCase() === lowerName
+    );
+  }
+
+  return false;
 }

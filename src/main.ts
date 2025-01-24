@@ -5,11 +5,18 @@ import {
   saveSettingsAsync,
   showUI,
 } from "@create-figma-plugin/utilities";
-import { isFigmaGeneratedName, isValidFigmaNodeType } from "./figma-node-types";
+import {
+  figmaNameWithNumberRegex,
+  isFigmaGeneratedName,
+  isValidFigmaNodeType,
+} from "./figma-node-types";
 import { NamingStrategyManager } from "./naming-strategies/manager";
 import { AllOptions } from "./types";
 
-// 定义插件生成的图层名称列表
+/**
+ * 定义插件可以识别和处理的自动生成图层名称列表
+ * 这些名称通常由设计工具或其他插件自动创建
+ */
 const PLUGIN_GENERATED_NAMES = [
   "group",
   "frame",
@@ -24,20 +31,72 @@ const PLUGIN_GENERATED_NAMES = [
   "exclude",
 ];
 
-// 创建插件生成的图层名称模式的正则表达式
+/**
+ * 创建用于匹配插件生成名称的正则表达式
+ * 格式: name-[number] 或 name-[number,number]
+ * 例如: "frame-[1]" 或 "grid-[1,2]"
+ */
 const PLUGIN_NAME_PATTERN = new RegExp(
   `^(${PLUGIN_GENERATED_NAMES.join("|")})(-\\[\\d+(?:,\\s*\\d+)?\\])?$`,
   "i"
 );
 
+/**
+ * 根据节点类型验证名称是否为插件生成
+ * @param node - Figma 场景节点，用于检查其类型和属性
+ * @param name - 节点名称（小写），需要验证的名称字符串
+ * @returns {boolean} 如果名称与节点类型匹配则返回 true
+ */
+function isPluginGeneratedNameBasedOnType(
+  node: SceneNode,
+  name: string
+): boolean {
+  // 移除可能的间距信息后再进行匹配
+  const baseName = name.replace(/-\[\d+(?:,\s*\d+)?\]$/, "");
+
+  switch (baseName) {
+    case "group":
+      return node.type === "GROUP";
+    case "frame":
+    case "grid":
+    case "row":
+    case "col":
+      return node.type === "FRAME";
+    case "image":
+    case "video":
+      return (
+        "fills" in node &&
+        (node.fills as Paint[]).some(
+          (fill) => fill.type === baseName.toUpperCase()
+        )
+      );
+    case "union":
+    case "subtract":
+    case "intersect":
+    case "exclude":
+      return (
+        node.type === "BOOLEAN_OPERATION" &&
+        (node as BooleanOperationNode).booleanOperation.toLowerCase() ===
+          baseName
+      );
+    default:
+      return false;
+  }
+}
+
 // 初始化命名策略管理器
 const namingManager = new NamingStrategyManager();
 
 /**
- * 重命名单个图层
- * @param node 要重命名的图层节点
- * @param options 重命名选项
- * @returns 如果图层被重命名则返回 Promise<boolean>
+ * 重命名单个图层的核心逻辑
+ * 包含以下判断：
+ * 1. 检查图层是否需要跳过（锁定/隐藏/实例）
+ * 2. 验证是否需要重命名（自定义名称或自动生成名称）
+ * 3. 处理命名规则（如 PascalCase）
+ * @param node - 需要重命名的 Figma 场景节点
+ * @param options - 重命名配置选项，包含是否处理锁定/隐藏/实例等设置
+ * @returns {Promise<boolean>} 如果节点被重命名则返回 true，否则返回 false
+ * @throws 当重命名过程出错时抛出异常
  */
 async function renameLayer(
   node: SceneNode,
@@ -75,9 +134,13 @@ async function renameLayer(
 }
 
 /**
- * 批量处理节点
- * @param nodes 要处理的节点数组
- * @param options 重命名选项
+ * 批量处理节点的重命名操作
+ * 使用分批处理避免性能问题：
+ * - 每批处理 50 个节点
+ * - 批次间添加微小延迟避免阻塞主线程
+ * @param nodes - 需要处理的 Figma 场景节点数组
+ * @param options - 重命名配置选项
+ * @returns {Promise<boolean>} 如果任何节点被重命名则返回 true
  */
 async function processBatchNodes(
   nodes: readonly SceneNode[],
@@ -160,9 +223,14 @@ async function renameNodeAndChildren(
 }
 
 /**
- * 判断图层名称是否为 Figma 或插件自动生成的
- * @param node 图层节点
- * @returns 是否为 Figma 或插件自动生成的名称
+ * 判断节点名称是否为自动生成
+ * 检查三种情况：
+ * 1. 文本节点的自动重命名标志
+ * 2. 组件相关的默认命名
+ * 3. Figma 默认生成的名称
+ * 4. 插件生成的名称
+ * @param node - 要检查的 Figma 场景节点
+ * @returns {boolean} 如果节点名称是自动生成的则返回 true
  */
 function isFigmaOrPluginGeneratedName(node: SceneNode): boolean {
   const name = node.name.toLowerCase();
@@ -181,21 +249,27 @@ function isFigmaOrPluginGeneratedName(node: SceneNode): boolean {
   // 组件类型的特殊处理
   if (node.type === "COMPONENT" || node.type === "COMPONENT_SET") {
     return (
-      name === "component" || name === "componentset" || /^\S+\s\d+$/.test(name)
+      name === "component" ||
+      name === "componentset" ||
+      figmaNameWithNumberRegex.test(name)
     );
   }
 
-  // 检查是否为 Figma 生成的名称
-  if (isFigmaGeneratedName(name)) {
+  // 检查是否为 Figma 生成的名称，传入节点类型进行匹配
+  if (isFigmaGeneratedName(node)) {
     return true;
   }
 
-  // 检查是否匹配插件生成的名称模式
-  return PLUGIN_NAME_PATTERN.test(name);
+  // 根据节点类型和名称的关系判断是否是插件生成的名称
+  return isPluginGeneratedNameBasedOnType(node, name);
 }
 
 /**
- * 插件主函数
+ * 插件入口函数
+ * 主要职责：
+ * 1. 初始化 UI 和配置
+ * 2. 设置事件监听器
+ * 3. 处理用户交互和重命名操作
  */
 export default async function () {
   // 设置 UI 窗口大小
