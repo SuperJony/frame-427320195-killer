@@ -272,12 +272,6 @@ function isFigmaOrPluginGeneratedName(node: SceneNode): boolean {
  * 3. 处理用户交互和重命名操作
  */
 export default async function () {
-  // 设置 UI 窗口大小
-  const uiOptions = {
-    width: 240,
-    height: 262,
-  };
-
   // 加载保存的设置
   const savedOptions: AllOptions = await loadSettingsAsync(
     {
@@ -287,9 +281,19 @@ export default async function () {
       showSpacing: false,
       renameCustomNames: false,
       usePascalCase: false,
+      language: "en", // 添加默认语言设置
     },
     "allOptions"
   );
+
+  // 根据语言设置初始高度
+  const initialHeight = savedOptions.language === "zh" ? 262 : 246;
+
+  // 设置 UI 窗口大小
+  const uiOptions = {
+    width: 240,
+    height: initialHeight,
+  };
 
   const data = {
     savedOptions: savedOptions,
@@ -305,8 +309,9 @@ export default async function () {
   });
 
   // 监听 UI 设置面板开关事件
-  on("SETTING_OPEN", (settingOpen: boolean) => {
-    figma.ui.resize(240, settingOpen ? 262 : 408);
+  on("SETTING_OPEN", (data: { settingOpen: boolean; language: string }) => {
+    const baseHeight = data.language === "zh" ? 262 : 246;
+    figma.ui.resize(240, data.settingOpen ? 456 : baseHeight);
   });
 
   // 监听重命名事件
@@ -332,6 +337,16 @@ export default async function () {
     } catch (error) {
       console.error("重命名过程出错:", error);
       figma.notify("❌ 重命名过程中出现错误", { error: true });
+    }
+  });
+
+  // 添加保存设置的事件监听
+  on("SAVE_SETTINGS", async (options: AllOptions) => {
+    try {
+      await saveSettingsAsync(options, "allOptions");
+    } catch (error) {
+      console.error("保存设置失败:", error);
+      figma.notify("设置保存失败", { error: true });
     }
   });
 }

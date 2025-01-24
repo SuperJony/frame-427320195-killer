@@ -1,0 +1,106 @@
+import { Language } from "./types";
+
+interface I18nConfig {
+  renameLayerButton: string;
+  selectLayerFirst: string;
+  settingsTitle: string;
+  languageLabel: string;
+  renameTargetsLabel: string;
+  options: {
+    instance: {
+      title: string;
+      description?: string;
+    };
+    locked: {
+      title: string;
+      description?: string;
+    };
+    hidden: {
+      title: string;
+      description?: string;
+    };
+    renameCustomNames: {
+      title: string;
+      description?: string;
+    };
+    showSpacing: {
+      title: string;
+      description?: string;
+    };
+    usePascalCase: {
+      title: string;
+      description?: string;
+    };
+  };
+}
+
+export const i18n: Record<Language, I18nConfig> = {
+  en: {
+    renameLayerButton: "Rename Layers",
+    selectLayerFirst: "Select layers first",
+    settingsTitle: "🛠️ Settings",
+    languageLabel: "🌐 Language",
+    renameTargetsLabel: "Also rename the following layers:",
+    options: {
+      instance: {
+        title: "Instance",
+        // description: "Rename components inside instances",
+      },
+      locked: {
+        title: "Locked",
+        // description: "Rename locked layers",
+      },
+      hidden: {
+        title: "Hidden",
+        // description: "Rename hidden layers",
+      },
+      renameCustomNames: {
+        title: "Custom Names",
+        description:
+          "Enable this option to rename layers with custom names. Disable this option to only rename Figma and plugin-generated layer names",
+      },
+      showSpacing: {
+        title: "Show Spacing",
+        // description: "Show auto layout spacing in layer names",
+      },
+      usePascalCase: {
+        title: "Use PascalCase",
+        // description: "Use PascalCase for layer names",
+      },
+    },
+  },
+  zh: {
+    renameLayerButton: "重命名图层",
+    selectLayerFirst: "请先选择图层",
+    settingsTitle: "🛠️ 设置",
+    languageLabel: "🌐 语言",
+    renameTargetsLabel: "除了基础图层以外，对以下图层也进行重命名 :",
+    options: {
+      instance: {
+        title: "组件实例",
+        // description: "重命名组件实例内的图层",
+      },
+      locked: {
+        title: "锁定图层",
+        // description: "重命名被锁定的图层",
+      },
+      hidden: {
+        title: "隐藏图层",
+        // description: "重命名被隐藏的图层",
+      },
+      renameCustomNames: {
+        title: "大扫除模式",
+        description:
+          "启用此选项将重命名用户自定义的图层名称。禁用时，仅重命名 Figma 和插件自动生成的图层名称",
+      },
+      showSpacing: {
+        title: "显示间距",
+        // description: "在图层名称中显示自动布局间距",
+      },
+      usePascalCase: {
+        title: "使用大驼峰命名",
+        // description: "使用帕斯卡命名法命名图层",
+      },
+    },
+  },
+};
