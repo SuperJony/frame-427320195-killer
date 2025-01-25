@@ -1,16 +1,13 @@
-import { RenameOptions, SettingOptions } from "./types";
+import { OptionKey, RenameOptionKey, SettingOptionKey } from "./types";
 
-type RenameOptionConfig = {
-  key: keyof RenameOptions;
+interface OptionConfig {
+  key: OptionKey;
   emoji: string;
-};
+}
 
-type SettingOptionConfig = {
-  key: Exclude<keyof SettingOptions, "language">; // Exclude language from settings options
-  emoji: string;
-};
-
-export const renameOptionsConfig: RenameOptionConfig[] = [
+export const renameOptionsConfig: Array<
+  OptionConfig & { key: RenameOptionKey }
+> = [
   {
     key: "locked",
     emoji: "🔒",
@@ -25,7 +22,9 @@ export const renameOptionsConfig: RenameOptionConfig[] = [
   },
 ];
 
-export const settingOptionsConfig: SettingOptionConfig[] = [
+export const settingOptionsConfig: Array<
+  OptionConfig & { key: SettingOptionKey }
+> = [
   {
     key: "renameCustomNames",
     emoji: "🛁",

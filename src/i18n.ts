@@ -1,40 +1,28 @@
 import { Language } from "./types";
 
-interface I18nConfig {
+interface OptionTranslation {
+  title: string;
+  description?: string;
+}
+
+// 定义翻译接口
+export interface Translation {
   renameLayerButton: string;
   selectLayerFirst: string;
   settingsTitle: string;
   languageLabel: string;
   renameTargetsLabel: string;
   options: {
-    instance: {
-      title: string;
-      description?: string;
-    };
-    locked: {
-      title: string;
-      description?: string;
-    };
-    hidden: {
-      title: string;
-      description?: string;
-    };
-    renameCustomNames: {
-      title: string;
-      description?: string;
-    };
-    showSpacing: {
-      title: string;
-      description?: string;
-    };
-    usePascalCase: {
-      title: string;
-      description?: string;
-    };
+    instance: OptionTranslation;
+    locked: OptionTranslation;
+    hidden: OptionTranslation;
+    renameCustomNames: OptionTranslation;
+    showSpacing: OptionTranslation;
+    usePascalCase: OptionTranslation;
   };
 }
 
-export const i18n: Record<Language, I18nConfig> = {
+export const i18n: Record<Language, Translation> = {
   en: {
     renameLayerButton: "Rename Layers",
     selectLayerFirst: "Select layers first",

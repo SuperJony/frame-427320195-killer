@@ -151,17 +151,13 @@ function Plugin({
               onValueChange={() => handleRenameOptionChange(option.key)}
             >
               <Text>
-                {option.emoji}{" "}
-                {t.options[option.key as keyof typeof t.options].title}
+                {option.emoji} {t.options[option.key].title}
               </Text>
-              {t.options[option.key as keyof typeof t.options].description && (
+              {t.options[option.key].description && (
                 <>
                   <VerticalSpace space="small" />
                   <Text style={{ color: "#999" }}>
-                    {
-                      t.options[option.key as keyof typeof t.options]
-                        .description
-                    }
+                    {t.options[option.key].description}
                   </Text>
                 </>
               )}
@@ -196,17 +192,13 @@ function Plugin({
               onValueChange={() => handleSettingOptionChange(option.key)}
             >
               <Text>
-                {option.emoji}{" "}
-                {t.options[option.key as keyof typeof t.options].title}
+                {option.emoji} {t.options[option.key].title}
               </Text>
-              {t.options[option.key as keyof typeof t.options].description && (
+              {t.options[option.key].description && (
                 <>
                   <VerticalSpace space="small" />
                   <Text style={{ color: "#999" }}>
-                    {
-                      t.options[option.key as keyof typeof t.options]
-                        .description
-                    }
+                    {t.options[option.key].description}
                   </Text>
                 </>
               )}
